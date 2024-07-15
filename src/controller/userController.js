@@ -46,26 +46,61 @@ const register = async (req, res) => {
 const login = async (req, res) => {
   const { email, password } = req.body;
   const query = "SELECT * FROM user WHERE email = ?";
-  if (!password) response(401, "INVALID", "Email Atau Passowrd salah! Coba lagi!!", res);
 
-  db.query(query, [email], (err, result) => {
-    if (err) response(500, "INVALID", "Email Atau Passowrd salah! Coba lagi!!", res);
+  db.query(query, [email], async (err, result) => {
+    if (err) {
+      return response(500, "INVALID", "Terjadi kesalahan dalam mencari pengguna.", res);
+    }
 
-    const passCompare = bcrypt.compare(password, result[0].password);
+    if (result.length === 0) {
+      return response(401, "INVALID", "Email atau Password salah! Coba lagi!!", res);
+    }
 
-    if (!passCompare) response(401, "INVALID", "Email Atau Passowrd salah! Coba lagi!!", res);
+    try {
+      const passCompare = await bcrypt.compare(password, result[0].password);
 
-    const token = jwt.sign({ id: result[0].id }, process.env.SECRETE_KEY, { expiresIn: 60 * 60 * 1 });
+      if (!passCompare) {
+        return response(401, "INVALID", "Email atau Password salah! Coba lagi!!", res);
+      }
 
-    const data = {
-      auth: true,
-      token: token,
-    };
-    return response(200, data, "Login Success", res);
+      const token = jwt.sign({ id: result[0].id }, process.env.SECRETE_KEY, { expiresIn: 60 * 60 * 1 });
+
+      const data = {
+        auth: true,
+        token: token,
+      };
+
+      return response(200, data, "Login Success", res);
+    } catch (error) {
+      console.error("Error comparing passwords:", error);
+      return response(500, "INVALID", "Terjadi kesalahan dalam autentikasi.", res);
+    }
   });
+};
+
+const userInfo = async (req, res) => {
+  const { token } = req.body;
+
+  try {
+    console.log(process.env.SECRETE_KEY);
+    console.log(token);
+    const user = jwt.verify(token, process.env.SECRETE_KEY);
+
+    const id = user.id;
+
+    const qry = `SELECT * FROM user WHERE id=${id}`;
+
+    db.query(qry, (err, result) => {
+      if (err) response(401, "error", "error", res);
+      return response(200, result, "GET INFO USER SUCCESS", res);
+    });
+  } catch (error) {
+    return response(401, "Invalid", "No INFO USER", res);
+  }
 };
 
 module.exports = {
   register,
   login,
+  userInfo,
 };
