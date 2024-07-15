@@ -6,10 +6,10 @@ const bcrypt = require("bcrypt");
 const jwt = require("jsonwebtoken");
 
 const test = (req, res) => {
-  res.send("hello");
+  // res.send("hello");
   const cekEmail = "SELECT * FROM user WHERE";
-
   db.query(cekEmail, (err, result) => {
+    if (err) res.send(err);
     res.send(result);
   });
 };
