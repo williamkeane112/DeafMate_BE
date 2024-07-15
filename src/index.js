@@ -26,5 +26,5 @@ app.get("/", (req, res) => {
 app.use("/user", user);
 
 app.listen(process.env.PORT, () => {
-  console.log(`Listen in http://localhost:${process.env.PORT}`);
+  console.log(`Listen in ${process.env.POR}`);
 });
