@@ -7,7 +7,7 @@ const jwt = require("jsonwebtoken");
 
 const test = (req, res) => {
   // res.send("hello");
-  const cekEmail = "SELECT * FROM user WHERE";
+  const cekEmail = "SELECT * FROM users WHERE";
   db.query(cekEmail, (err, result) => {
     if (err) res.send(err);
     res.send(result);
