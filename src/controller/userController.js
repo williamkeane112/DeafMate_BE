@@ -7,6 +7,11 @@ const jwt = require("jsonwebtoken");
 
 const test = (req, res) => {
   res.send("hello");
+  const cekEmail = "SELECT * FROM user WHERE";
+
+  db.query(cekEmail, (err, result) => {
+    res.send(result);
+  });
 };
 // logic
 const register = async (req, res) => {
