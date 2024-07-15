@@ -24,7 +24,7 @@ const register = async (req, res) => {
     }
 
     // Check email exists
-    const cekEmail = "SELECT * FROM user WHERE email = ?";
+    const cekEmail = "SELECT * FROM users WHERE email = ?";
     db.query(cekEmail, [email], async (err, result) => {
       if (err) return response(401, "Invalid", "Error", res);
 
@@ -35,7 +35,7 @@ const register = async (req, res) => {
       const passHash = await bcrypt.hash(password, rounds);
 
       // Insert new user
-      const query = "INSERT INTO user (email, nama, password) VALUES (?, ?, ?)";
+      const query = "INSERT INTO users (email, nama, password) VALUES (?, ?, ?)";
       const value = [email, nama, passHash];
       db.query(query, value, (err, result) => {
         if (err) return response(400, "Invalid", "Register gagal, Coba Lagi", res);
@@ -53,7 +53,7 @@ const register = async (req, res) => {
 
 const login = async (req, res) => {
   const { email, password } = req.body;
-  const query = "SELECT * FROM user WHERE email = ?";
+  const query = "SELECT * FROM users WHERE email = ?";
 
   db.query(query, [email], async (err, result) => {
     if (err) {
