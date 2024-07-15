@@ -5,6 +5,9 @@ const db = require("../config");
 const bcrypt = require("bcrypt");
 const jwt = require("jsonwebtoken");
 
+const test = (req, res) => {
+  res.send("hello");
+};
 // logic
 const register = async (req, res) => {
   try {
@@ -100,6 +103,7 @@ const userInfo = async (req, res) => {
 };
 
 module.exports = {
+  test,
   register,
   login,
   userInfo,
