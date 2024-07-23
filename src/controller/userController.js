@@ -5,25 +5,13 @@ const db = require("../config");
 const bcrypt = require("bcrypt");
 const jwt = require("jsonwebtoken");
 
-const test = (req, res) => {
-  // res.send("hello");
-  const cekEmail = "SELECT * FROM users";
-  db.query(cekEmail, (err, result) => {
-    res.send(result);
-  });
-};
 // logic
 const register = async (req, res) => {
   try {
-    const { email, nama, password, confirmPassword } = req.body;
-
-    // Check if passwords match
-    if (password !== confirmPassword) {
-      return response(401, "Invalid", "Password Dan Konfirmasi Password Tidak Sesuai", res);
-    }
+    const { email, nama, password } = req.body;
 
     // Check email exists
-    const cekEmail = "SELECT * FROM users WHERE email = ?";
+    const cekEmail = "SELECT * FROM user WHERE email = ?";
     db.query(cekEmail, [email], async (err, result) => {
       if (err) return response(401, "Invalid", "Error", res);
 
@@ -34,7 +22,7 @@ const register = async (req, res) => {
       const passHash = await bcrypt.hash(password, rounds);
 
       // Insert new user
-      const query = "INSERT INTO users (email, nama, password) VALUES (?, ?, ?)";
+      const query = "INSERT INTO user (email, nama, password) VALUES (?, ?, ?)";
       const value = [email, nama, passHash];
       db.query(query, value, (err, result) => {
         if (err) return response(400, "Invalid", "Register gagal, Coba Lagi", res);
@@ -52,7 +40,7 @@ const register = async (req, res) => {
 
 const login = async (req, res) => {
   const { email, password } = req.body;
-  const query = "SELECT * FROM users WHERE email = ?";
+  const query = "SELECT * FROM user WHERE email = ?";
 
   db.query(query, [email], async (err, result) => {
     if (err) {
@@ -70,7 +58,7 @@ const login = async (req, res) => {
         return response(401, "INVALID", "Email atau Password salah! Coba lagi!!", res);
       }
 
-      const token = jwt.sign({ id: result[0].id }, process.env.SECRETE_KEY, { expiresIn: 60 * 60 * 1 });
+      const token = jwt.sign({ id: result[0].id }, process.env.SECRETE_KEY, { expiresIn: 30 * 24 * 60 * 60 });
 
       const data = {
         auth: true,
@@ -89,8 +77,6 @@ const userInfo = async (req, res) => {
   const { token } = req.body;
 
   try {
-    console.log(process.env.SECRETE_KEY);
-    console.log(token);
     const user = jwt.verify(token, process.env.SECRETE_KEY);
 
     const id = user.id;
@@ -107,7 +93,6 @@ const userInfo = async (req, res) => {
 };
 
 module.exports = {
-  test,
   register,
   login,
   userInfo,
