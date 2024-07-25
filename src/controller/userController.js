@@ -40,6 +40,7 @@ const register = async (req, res) => {
 
 const login = async (req, res) => {
   const { email, password } = req.body;
+  console.log(email, password);
   const query = "SELECT * FROM user WHERE email = ?";
 
   db.query(query, [email], async (err, result) => {
